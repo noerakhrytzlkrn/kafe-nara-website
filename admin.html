@@ -170,6 +170,10 @@ function render(){
                     Ubah Status
                 </button>
 
+                <button onclick="hapusOrder(${index})" style="background:#e74c3c;">
+                    Hapus
+                </button>
+
             </div>
         `;
     });
@@ -190,6 +194,23 @@ function ubahStatus(index){
     else{
         data[index].status = "Menunggu";
     }
+
+    localStorage.setItem("riwayatPesanan", JSON.stringify(data));
+
+    render();
+}
+function hapusOrder(index){
+
+    if(data[index].status !== "Selesai"){
+        alert("Pesanan belum selesai, tidak bisa dihapus!");
+        return;
+    }
+
+    const konfirmasi = confirm("Hapus pesanan yang sudah selesai?");
+
+    if(!konfirmasi) return;
+
+    data.splice(index, 1);
 
     localStorage.setItem("riwayatPesanan", JSON.stringify(data));
 
