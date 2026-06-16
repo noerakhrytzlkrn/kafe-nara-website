@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Struk Pesanan - Nara Cafe</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#F8F4EE;
+    padding:30px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    color:#3E2723;
+    margin-bottom:20px;
+}
+
+.item{
+    display:flex;
+    justify-content:space-between;
+    margin:10px 0;
+}
+
+.total{
+    font-size:22px;
+    font-weight:bold;
+    color:#C67C4E;
+    margin-top:20px;
+}
+
+button{
+    padding:14px 20px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:25px;
+    margin-right:10px;
+    font-weight:600;
+}
+
+.btn-home{
+    background:#3E2723;
+    color:white;
+}
+
+.btn-print{
+    background:#C67C4E;
+    color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🧾 Struk Pesanan</h1>
+
+    <div id="isiStruk"></div>
+
+    <button class="btn-print"
+        onclick="window.print()">
+        Cetak Struk
+    </button>
+
+    <button class="btn-home"
+        onclick="window.location.href='index.html'">
+        Kembali ke Home
+    </button>
+
+</div>
+
+<script>
+
+const data = JSON.parse(localStorage.getItem("dataStruk"));
+
+const isi = document.getElementById("isiStruk");
+
+if (!data || !data.pesanan) {
+
+    isi.innerHTML = `
+        <div style="text-align:center;padding:30px;">
+            <h3>Struk tidak ditemukan</h3>
+            <p>Silakan lakukan pemesanan terlebih dahulu.</p>
+        </div>
+    `;
+
+} else {
+
+    let html = `
+        <p><strong>Nara Cafe</strong></p>
+        <p>Nomor Meja : ${data.meja}</p>
+        <p>Pembayaran : ${data.pembayaran}</p>
+        <hr>
+        <h3>Pesanan</h3>
+    `;
+
+    data.pesanan.forEach(item => {
+
+        html += `
+            <div class="item">
+                <span>${item.namaMenu} x${item.jumlah}</span>
+                <span>Rp ${(item.harga * item.jumlah).toLocaleString("id-ID")}</span>
+            </div>
+        `;
+    });
+
+    html += `
+        <hr>
+        <p class="total">
+            Total : Rp ${data.total.toLocaleString("id-ID")}
+        </p>
+
+        <p>Catatan : ${data.catatan || "-"}</p>
+
+        <br>
+
+        <p>Terima kasih telah memesan di Nara Cafe ☕</p>
+        <p>Pesanan Anda sedang diproses.</p>
+    `;
+
+    isi.innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>

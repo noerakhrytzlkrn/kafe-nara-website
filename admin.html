@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Dashboard - Nara Cafe</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:#F4F4F4;
+    margin:0;
+    padding:20px;
+}
+
+.header{
+    background:#3E2723;
+    color:white;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+}
+
+.stats{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+}
+
+.card-stat{
+    flex:1;
+    min-width:150px;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:15px;
+}
+
+.order-card{
+    background:white;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.1);
+    border-left:5px solid #3E2723;
+}
+
+.menu{
+    font-size:14px;
+    margin-left:10px;
+    color:#555;
+}
+
+.badge{
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:12px;
+    color:white;
+}
+
+.menunggu{background:#f39c12;}
+.proses{background:#3498db;}
+.selesai{background:#2ecc71;}
+
+button{
+    margin-top:10px;
+    padding:8px 12px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    background:#3E2723;
+    color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h2>🍽️ Admin Dashboard Nara Cafe</h2>
+</div>
+
+<div class="stats">
+    <div class="card-stat">
+        <h3 id="totalOrder">0</h3>
+        <p>Total Order</p>
+    </div>
+
+    <div class="card-stat">
+        <h3 id="totalItem">0</h3>
+        <p>Total Item Terjual</p>
+    </div>
+
+    <div class="card-stat">
+        <h3 id="totalSelesai">0</h3>
+        <p>Order Selesai</p>
+    </div>
+</div>
+
+<div class="container" id="orderList"></div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("riwayatPesanan")) || [];
+
+function render(){
+
+    const container = document.getElementById("orderList");
+
+    container.innerHTML = "";
+
+    let totalItem = 0;
+    let totalSelesai = 0;
+
+    data.forEach((item, index) => {
+
+        if(item.status === "Selesai"){
+            totalSelesai++;
+        }
+
+        let menuList = "";
+
+        item.pesanan.forEach(m => {
+            totalItem += m.jumlah;
+
+            menuList += `
+                <div class="menu">
+                    • ${m.namaMenu} x${m.jumlah}
+                </div>
+            `;
+        });
+
+        let badgeClass = "menunggu";
+
+        if(item.status === "Diproses") badgeClass = "proses";
+        if(item.status === "Selesai") badgeClass = "selesai";
+
+        container.innerHTML += `
+            <div class="order-card">
+
+                <h3>${item.namaUser}</h3>
+                <p>Meja: ${item.meja}</p>
+                <p>Pembayaran: ${item.pembayaran}</p>
+
+                <p><b>Pesanan:</b></p>
+                ${menuList}
+
+                <p><b>Total:</b> Rp ${item.total.toLocaleString("id-ID")}</p>
+
+                <span class="badge ${badgeClass}">
+                    ${item.status}
+                </span>
+
+                <br>
+
+                <button onclick="ubahStatus(${index})">
+                    Ubah Status
+                </button>
+
+            </div>
+        `;
+    });
+
+    document.getElementById("totalOrder").innerText = data.length;
+    document.getElementById("totalItem").innerText = totalItem;
+    document.getElementById("totalSelesai").innerText = totalSelesai;
+}
+
+function ubahStatus(index){
+
+    if(data[index].status === "Menunggu"){
+        data[index].status = "Diproses";
+    }
+    else if(data[index].status === "Diproses"){
+        data[index].status = "Selesai";
+    }
+    else{
+        data[index].status = "Menunggu";
+    }
+
+    localStorage.setItem("riwayatPesanan", JSON.stringify(data));
+
+    render();
+}
+
+/* auto refresh biar realtime */
+setInterval(() => {
+    data = JSON.parse(localStorage.getItem("riwayatPesanan")) || [];
+    render();
+}, 2000);
+
+render();
+
+</script>
+
+</body>
+</html>
